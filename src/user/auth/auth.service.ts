@@ -1,4 +1,9 @@
-import { ConflictException, HttpException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserType } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
@@ -10,6 +15,8 @@ interface SignupParams {
   email: string;
   phone: string;
   password: string;
+  productKey?: string;
+  userType: UserType;
 }
 
 interface SigninParams {
@@ -21,22 +28,38 @@ interface SigninParams {
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async signup({ email, password, name, phone }: SignupParams) {
+  async signup({
+    email,
+    password,
+    name,
+    phone,
+    productKey,
+    userType,
+  }: SignupParams) {
+    if (userType !== UserType.BUYER) {
+      if (!productKey) throw new UnauthorizedException();
+
+      const key = `${email}-${userType}-${process.env.PRODUCT_KEY_SECRET}`;
+      const isKeyMatches = await bcrypt.compare(key, productKey);
+
+      if (!isKeyMatches) throw new UnauthorizedException();
+    }
+
     const userExists = await this.prismaService.user.findFirst({
       where: { email },
     });
 
     if (userExists) throw new ConflictException();
 
-    const hashed = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await this.prismaService.user.create({
       data: {
         email,
-        password: hashed,
+        password: hashedPassword,
         name,
         phone,
-        user_type: UserType.BUYER,
+        user_type: userType,
       },
     });
 
@@ -55,6 +78,11 @@ export class AuthService {
 
     const token = await this.generateJWT(user.id, user.name);
     return { token };
+  }
+
+  async generateProductKey(email: string, userType: UserType) {
+    const str = `${email}-${userType}-${process.env.PRODUCT_KEY_SECRET}`;
+    return await bcrypt.hash(str, 10);
   }
 
   private generateJWT(id: number, name: string) {
