@@ -48,6 +48,8 @@ export class HomeResponseDto {
     return this.property_type;
   }
 
+  image: string;
+
   @Exclude()
   created_at: Date;
   @Exclude()
