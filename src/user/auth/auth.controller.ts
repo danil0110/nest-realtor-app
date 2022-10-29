@@ -1,4 +1,11 @@
-import { Body, Controller, Param, ParseEnumPipe, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Param,
+  ParseEnumPipe,
+  Post,
+} from '@nestjs/common';
 import { UserType } from '@prisma/client';
 import { GenerateProductKeyDto, SigninDto, SignupDto } from '../dtos/auth.dto';
 import { AuthService } from './auth.service';
@@ -16,6 +23,7 @@ export class AuthController {
   }
 
   @Post('signin')
+  @HttpCode(200)
   signin(@Body() body: SigninDto) {
     return this.authService.signin(body);
   }
