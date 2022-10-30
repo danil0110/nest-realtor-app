@@ -59,7 +59,7 @@ export class AuthService {
         password: hashedPassword,
         name,
         phone,
-        user_type: userType,
+        userType: userType,
       },
     });
 

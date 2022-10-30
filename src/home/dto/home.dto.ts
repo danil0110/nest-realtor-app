@@ -4,58 +4,21 @@ import { PropertyType } from '@prisma/client';
 export class HomeResponseDto {
   id: number;
   address: string;
-  @Exclude()
-  number_of_bedrooms: number;
-
-  @Expose({ name: 'numberOfBedrooms' })
-  numberOfBedrooms() {
-    return this.number_of_bedrooms;
-  }
-
-  @Exclude()
-  number_of_bathrooms: number;
-
-  @Expose({ name: 'numberOfBathrooms' })
-  numberOfBathrooms() {
-    return this.number_of_bathrooms;
-  }
-
+  numberOfBedrooms: number;
+  numberOfBathrooms: number;
   city: string;
-
-  @Exclude()
-  listed_date: Date;
-
-  @Expose({ name: 'listedDate' })
-  listedDate() {
-    return this.listed_date;
-  }
-
+  listedDate: Date;
   price: number;
-
-  @Exclude()
-  land_size: number;
-
-  @Expose({ name: 'landSize' })
-  landSize() {
-    return this.land_size;
-  }
-
-  @Exclude()
-  property_type: PropertyType;
-
-  @Expose({ name: 'propertyType' })
-  propertyType() {
-    return this.property_type;
-  }
-
+  landSize: number;
+  propertyType: PropertyType;
   image: string;
 
   @Exclude()
-  created_at: Date;
+  createdAt: Date;
   @Exclude()
-  updated_at: Date;
+  updatedAt: Date;
   @Exclude()
-  realtor_id: number;
+  realtorId: number;
 
   constructor(partial: Partial<HomeResponseDto>) {
     Object.assign(this, partial);
