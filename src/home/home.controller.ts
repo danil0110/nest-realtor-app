@@ -8,12 +8,10 @@ import {
   Post,
   Put,
   Query,
-  UseInterceptors,
 } from '@nestjs/common';
 import { PropertyType, UserType } from '@prisma/client';
 import { Roles } from 'src/decorators/roles.decorator';
 import { User, UserInfo } from 'src/user/decorators/user.decorator';
-import { UserInterceptor } from 'src/user/interceptors/user.interceptor';
 import {
   CreateHomeDto,
   HomeResponseDto,
@@ -74,14 +72,12 @@ export class HomeController {
 
   @Roles(UserType.REALTOR)
   @Post()
-  @UseInterceptors(UserInterceptor)
   createHome(@Body() body: CreateHomeDto, @User() user: UserInfo) {
     return this.homeService.createHome(body, user.id);
   }
 
   @Roles(UserType.REALTOR)
   @Put(':id')
-  @UseInterceptors(UserInterceptor)
   updateHome(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHomeDto,
@@ -92,14 +88,12 @@ export class HomeController {
 
   @Roles(UserType.REALTOR)
   @Delete(':id')
-  @UseInterceptors(UserInterceptor)
   deleteHome(@Param('id', ParseIntPipe) id: number, @User() user: UserInfo) {
     return this.homeService.deleteHomeById(id, user.id);
   }
 
   @Roles(UserType.BUYER)
   @Post(':id/inquire')
-  @UseInterceptors(UserInterceptor)
   inquire(
     @Param('id', ParseIntPipe) homeId: number,
     @User() user: UserInfo,
@@ -110,7 +104,6 @@ export class HomeController {
 
   @Roles(UserType.REALTOR)
   @Get(':id/messages')
-  @UseInterceptors(UserInterceptor)
   getMessagesByHome(
     @Param('id', ParseIntPipe) homeId: number,
     @User() realtor: UserInfo,
