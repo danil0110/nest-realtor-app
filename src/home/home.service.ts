@@ -134,8 +134,8 @@ export class HomeService {
     return new HomeResponseDto(home);
   }
 
-  async updateHome(id: number, data: UpdateHomeParams) {
-    const home = this.prismaService.home.findUnique({ where: { id } });
+  async updateHomeById(id: number, data: UpdateHomeParams) {
+    const home = await this.prismaService.home.findUnique({ where: { id } });
 
     if (!home) throw new NotFoundException();
 
@@ -144,6 +144,15 @@ export class HomeService {
       data,
     });
 
-    return updatedHome;
+    return new HomeResponseDto(updatedHome);
+  }
+
+  async deleteHomeById(id: number) {
+    const home = await this.prismaService.home.findUnique({ where: { id } });
+
+    if (!home) throw new NotFoundException();
+
+    const deletedHome = await this.prismaService.home.delete({ where: { id } });
+    return new HomeResponseDto(deletedHome);
   }
 }

@@ -73,11 +73,11 @@ export class HomeController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHomeDto,
   ) {
-    return this.homeService.updateHome(id, body);
+    return this.homeService.updateHomeById(id, body);
   }
 
   @Delete(':id')
-  deleteHome() {
-    return {};
+  deleteHome(@Param('id', ParseIntPipe) id: number) {
+    return this.homeService.deleteHomeById(id);
   }
 }
