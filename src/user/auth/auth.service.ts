@@ -63,7 +63,11 @@ export class AuthService {
       },
     });
 
-    const token = await this.generateJWT(user.id, user.name);
+    const token = await this.generateJWT({
+      id: user.id,
+      name: user.name,
+    });
+
     return { token };
   }
 
@@ -76,7 +80,11 @@ export class AuthService {
 
     if (!isValidPassword) throw new HttpException('Invalid credentials', 400);
 
-    const token = await this.generateJWT(user.id, user.name);
+    const token = await this.generateJWT({
+      id: user.id,
+      name: user.name,
+    });
+
     return { token };
   }
 
@@ -85,7 +93,7 @@ export class AuthService {
     return await bcrypt.hash(str, 10);
   }
 
-  private generateJWT(id: number, name: string) {
-    return jwt.sign({ id, name }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  private generateJWT<T extends object>(payload: T) {
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
   }
 }
