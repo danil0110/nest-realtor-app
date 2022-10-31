@@ -8,9 +8,11 @@ import {
   Post,
   Put,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PropertyType } from '@prisma/client';
 import { User, UserInfo } from 'src/user/decorators/user.decorator';
+import { UserInterceptor } from 'src/user/interceptors/user.interceptor';
 import { CreateHomeDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
 import { HomeService } from './home.service';
 
@@ -65,20 +67,24 @@ export class HomeController {
   }
 
   @Post()
+  @UseInterceptors(UserInterceptor)
   createHome(@Body() body: CreateHomeDto, @User() user: UserInfo) {
     return this.homeService.createHome(body, user.id);
   }
 
   @Put(':id')
+  @UseInterceptors(UserInterceptor)
   updateHome(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHomeDto,
+    @User() user: UserInfo,
   ) {
-    return this.homeService.updateHomeById(id, body);
+    return this.homeService.updateHomeById(id, body, user.id);
   }
 
   @Delete(':id')
-  deleteHome(@Param('id', ParseIntPipe) id: number) {
-    return this.homeService.deleteHomeById(id);
+  @UseInterceptors(UserInterceptor)
+  deleteHome(@Param('id', ParseIntPipe) id: number, @User() user: UserInfo) {
+    return this.homeService.deleteHomeById(id, user.id);
   }
 }

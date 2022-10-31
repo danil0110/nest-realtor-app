@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PropertyType } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HomeResponseDto } from './dto/home.dto';
@@ -137,10 +141,14 @@ export class HomeService {
     return new HomeResponseDto(home);
   }
 
-  async updateHomeById(id: number, data: UpdateHomeParams) {
+  async updateHomeById(id: number, data: UpdateHomeParams, userId: number) {
     const home = await this.prismaService.home.findUnique({ where: { id } });
 
     if (!home) throw new NotFoundException();
+
+    const realtor = await this.getRealtorByHomeId(home.id);
+
+    if (realtor.id !== userId) throw new UnauthorizedException();
 
     const updatedHome = await this.prismaService.home.update({
       where: { id },
@@ -150,12 +158,27 @@ export class HomeService {
     return new HomeResponseDto(updatedHome);
   }
 
-  async deleteHomeById(id: number) {
+  async deleteHomeById(id: number, userId: number) {
     const home = await this.prismaService.home.findUnique({ where: { id } });
 
     if (!home) throw new NotFoundException();
 
+    const realtor = await this.getRealtorByHomeId(home.id);
+
+    if (realtor.id !== userId) throw new UnauthorizedException();
+
     const deletedHome = await this.prismaService.home.delete({ where: { id } });
     return new HomeResponseDto(deletedHome);
+  }
+
+  async getRealtorByHomeId(id: number) {
+    const home = await this.prismaService.home.findUnique({
+      where: { id },
+      select: { realtor: true },
+    });
+
+    if (!home) throw new NotFoundException();
+
+    return home.realtor;
   }
 }
