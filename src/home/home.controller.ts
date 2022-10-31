@@ -14,7 +14,12 @@ import { PropertyType, UserType } from '@prisma/client';
 import { Roles } from 'src/decorators/roles.decorator';
 import { User, UserInfo } from 'src/user/decorators/user.decorator';
 import { UserInterceptor } from 'src/user/interceptors/user.interceptor';
-import { CreateHomeDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
+import {
+  CreateHomeDto,
+  HomeResponseDto,
+  InquireDto,
+  UpdateHomeDto,
+} from './dto/home.dto';
 import { HomeService } from './home.service';
 
 @Controller('home')
@@ -90,5 +95,26 @@ export class HomeController {
   @UseInterceptors(UserInterceptor)
   deleteHome(@Param('id', ParseIntPipe) id: number, @User() user: UserInfo) {
     return this.homeService.deleteHomeById(id, user.id);
+  }
+
+  @Roles(UserType.BUYER)
+  @Post(':id/inquire')
+  @UseInterceptors(UserInterceptor)
+  inquire(
+    @Param('id', ParseIntPipe) homeId: number,
+    @User() user: UserInfo,
+    @Body() { message }: InquireDto,
+  ) {
+    return this.homeService.inquire(homeId, user, message);
+  }
+
+  @Roles(UserType.REALTOR)
+  @Get(':id/messages')
+  @UseInterceptors(UserInterceptor)
+  getMessagesByHome(
+    @Param('id', ParseIntPipe) homeId: number,
+    @User() realtor: UserInfo,
+  ) {
+    return this.homeService.getMessagesByHome(homeId, realtor);
   }
 }

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PropertyType } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserInfo } from 'src/user/decorators/user.decorator';
 import { HomeResponseDto } from './dto/home.dto';
 
 interface GetHomesParams {
@@ -180,5 +181,40 @@ export class HomeService {
     if (!home) throw new NotFoundException();
 
     return home.realtor;
+  }
+
+  async inquire(homeId: number, buyer: UserInfo, message: string) {
+    const realtor = await this.getRealtorByHomeId(homeId);
+
+    const newMessage = await this.prismaService.message.create({
+      data: {
+        buyerId: buyer.id,
+        realtorId: realtor.id,
+        homeId,
+        message,
+      },
+    });
+
+    return newMessage;
+  }
+
+  getMessagesByHome(id: number, realtor: UserInfo) {
+    return this.prismaService.message.findMany({
+      select: {
+        message: true,
+        buyer: {
+          select: {
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+      },
+
+      where: {
+        homeId: id,
+        realtorId: realtor.id,
+      },
+    });
   }
 }
