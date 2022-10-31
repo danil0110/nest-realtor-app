@@ -7,6 +7,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { UserType } from '@prisma/client';
+import { Roles } from 'src/decorators/roles.decorator';
 import { GenerateProductKeyDto, SigninDto, SignupDto } from '../dtos/auth.dto';
 import { AuthService } from './auth.service';
 
@@ -28,6 +29,7 @@ export class AuthController {
     return this.authService.signin(body);
   }
 
+  @Roles(UserType.ADMIN)
   @Post('key')
   generateProductKey(@Body() { email, userType }: GenerateProductKeyDto) {
     return this.authService.generateProductKey(email, userType);
