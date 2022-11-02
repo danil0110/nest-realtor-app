@@ -147,10 +147,6 @@ export class HomeService {
 
     if (!home) throw new NotFoundException();
 
-    const realtor = await this.getRealtorByHomeId(home.id);
-
-    if (realtor.id !== userId) throw new UnauthorizedException();
-
     const updatedHome = await this.prismaService.home.update({
       where: { id },
       data,

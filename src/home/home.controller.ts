@@ -8,10 +8,11 @@ import {
   Post,
   Put,
   Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PropertyType, UserType } from '@prisma/client';
-import { Roles } from 'src/decorators/roles.decorator';
-import { User, UserInfo } from 'src/user/decorators/user.decorator';
+import { Roles } from '../decorators/roles.decorator';
+import { User, UserInfo } from '../user/decorators/user.decorator';
 import {
   CreateHomeDto,
   HomeResponseDto,
@@ -78,11 +79,15 @@ export class HomeController {
 
   @Roles(UserType.REALTOR)
   @Put(':id')
-  updateHome(
+  async updateHome(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHomeDto,
     @User() user: UserInfo,
   ) {
+    const realtor = await this.homeService.getRealtorByHomeId(id);
+
+    if (realtor.id !== user.id) throw new UnauthorizedException();
+
     return this.homeService.updateHomeById(id, body, user.id);
   }
 
