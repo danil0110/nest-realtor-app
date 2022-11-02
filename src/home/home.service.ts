@@ -4,8 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PropertyType } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UserInfo } from 'src/user/decorators/user.decorator';
+import { PrismaService } from '../prisma/prisma.service';
+import { UserInfo } from '../user/decorators/user.decorator';
 import { HomeResponseDto } from './dto/home.dto';
 
 interface GetHomesParams {
