@@ -63,7 +63,7 @@ export class AuthService {
       },
     });
 
-    const token = await this.generateJWT({
+    const token = this.generateJWT({
       id: user.id,
       name: user.name,
     });
@@ -80,7 +80,7 @@ export class AuthService {
 
     if (!isValidPassword) throw new HttpException('Invalid credentials', 400);
 
-    const token = await this.generateJWT({
+    const token = this.generateJWT({
       id: user.id,
       name: user.name,
     });
